@@ -1,0 +1,7 @@
+<login>
+    <WebServerPort>1234</WebServerPort>
+    <MysqlPort></MysqlPort>
+    <MysqlIpAdresse></MysqlIpAdresse>
+    <MysqlUsername></MysqlUsername>
+    <MysqlPassword></MysqlPassword>
+</login>
