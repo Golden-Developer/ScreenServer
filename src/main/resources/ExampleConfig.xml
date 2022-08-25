@@ -1,6 +1,8 @@
 <login>
-    <WebServerPort>1234</WebServerPort>
+    <WebServerPort></WebServerPort>
+    <ServerPort></ServerPort>
     <MysqlPort></MysqlPort>
+    <ImageOutputPath></ImageOutputPath>
     <MysqlIpAdresse></MysqlIpAdresse>
     <MysqlUsername></MysqlUsername>
     <MysqlPassword></MysqlPassword>

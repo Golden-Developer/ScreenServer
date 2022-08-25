@@ -1,3 +1,4 @@
 .idea/
 /target/
 /src/main/resources/config.xml
+/src/main/resources/Config.xml

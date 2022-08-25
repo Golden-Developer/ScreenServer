@@ -21,10 +21,14 @@ public class Config {
     private String MysqlIpAdresse;
     private String MysqlUsername;
     private String MysqlPassword;
+    private String ImageOutputPath;
 
     public Config() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream local = classloader.getResourceAsStream("config.xml");
+        if (local == null) {
+            local = classloader.getResourceAsStream("Config.xml");
+        }
         readXML(local);
     }
 
@@ -43,6 +47,7 @@ public class Config {
                     String WebServerPort = element.getElementsByTagName("WebServerPort").item(0).getTextContent();
                     String MysqlPort = element.getElementsByTagName("MysqlPort").item(0).getTextContent();
                     String ServerPort = element.getElementsByTagName("ServerPort").item(0).getTextContent();
+                    String ImageOutputPath = element.getElementsByTagName("ImageOutputPath").item(0).getTextContent();
                     String MysqlIpAdresse = element.getElementsByTagName("MysqlIpAdresse").item(0).getTextContent();
                     String MysqlUsername = element.getElementsByTagName("MysqlUsername").item(0).getTextContent();
                     String MysqlPassword = element.getElementsByTagName("MysqlPassword").item(0).getTextContent();
@@ -64,6 +69,9 @@ public class Config {
                     }
                     if (!MysqlPassword.isEmpty() || !MysqlPassword.isBlank()) {
                         this.MysqlPassword = MysqlPassword;
+                    }
+                    if (!ImageOutputPath.isEmpty() || !ImageOutputPath.isBlank()) {
+                        this.ImageOutputPath = ImageOutputPath;
                     }
                 }
             }
@@ -94,6 +102,10 @@ public class Config {
 
     public String getWebServerPort() {
         return WebServerPort;
+    }
+
+    public String getImageOutputPath() {
+        return ImageOutputPath;
     }
 }
 
