@@ -45,9 +45,9 @@ public class WebReader {
                         InputStream inputStream = socket.getInputStream();
                         BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
                         BufferedImage bufferedImage = ImageIO.read(bufferedInputStream);
+
                         File outputfile = new File(Main.getConfig().getImageOutputPath() + generatedString + ".jpg");
                         ImageIO.write(bufferedImage, "jpg", outputfile);
-
                         ScreenClient screenClient = ScreenClient.findByID(id);
 
                         if (hasImage()) {
@@ -73,8 +73,15 @@ public class WebReader {
         }
     }
 
-
     public Boolean hasImage() {
         return true;
     }
 }
+
+
+/*
+*
+* ByteArrayOutputStream os = new ByteArrayOutputStream();
+ImageIO.write(image,"png", os);
+InputStream fis = new ByteArrayInputStream(os.toByteArray());
+* */

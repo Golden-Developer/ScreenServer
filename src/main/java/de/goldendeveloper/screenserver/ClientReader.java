@@ -43,7 +43,6 @@ public class ClientReader {
                     ScreenClient screenClient = ScreenClient.findByIpAdresse(IPAdresse);
                     if (screenClient == null) {
                         screenClient = ScreenClient.create(name,Port,IPAdresse, SSHPublic);
-                        System.out.println(screenClient.getID());
                     } else {
                         System.out.println("Bereits vorhanden");
                     }

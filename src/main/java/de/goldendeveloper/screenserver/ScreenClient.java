@@ -286,7 +286,7 @@ public class ScreenClient {
                 }
             }
         }
-/*        ImageIcon imageIcon = new ImageIcon(Main.getConfig().getImageIcon());
+/*
 
         try {
             OutputStream outputStream = socket.getOutputStream();
