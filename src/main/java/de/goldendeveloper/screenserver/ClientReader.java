@@ -6,27 +6,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.stream.Stream;
 
-public class Reader {
+public class ClientReader {
 
-    public Reader() throws IOException {
+    public ClientReader() throws IOException {
+        System.out.println("[ClientReader] Start ClientReader...");
         ServerSocket serverSocket = new ServerSocket(Main.getConfig().getServerPort());
+        System.out.println("[ClientReader] ClientReader ready");
         while (true) {
             Socket socket = null;
             try {
-                int leftLimit = 97;
-                int rightLimit = 122;
-                int targetStringLength = 10;
-                Random random = new Random();
-
-                String generatedString = random.ints(leftLimit, rightLimit + 1)
-                        .limit(targetStringLength)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-
                 socket = serverSocket.accept();
 
                 BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
@@ -39,31 +31,29 @@ public class Reader {
                     if (node.has("name")) {
                         name = node.get("name").asText();
                     } else {
-                        name = null;
+                        name = "none";
                     }
-                    String Port = node.get("Port").asText();
+                    int Port = node.get("Port").asInt();
                     String IPAdresse = node.get("IPAdresse").asText();
+                    String SSHPublic = node.get("SSHPublic").asText();
 
-                    System.out.println("Receiving Data Name: " + name + " Port: " + Port + " Server: " + IPAdresse);
-                    System.out.println("Get Data: " + name + Port + IPAdresse);
+                    System.out.println("[ClientReader] Receiving Data Name: " + name + " Port: " + Port + " Server: " + IPAdresse);
+                    System.out.println("[ClientReader] Get Data: " + name + " " + Port + " " + IPAdresse);
 
-                    //RUN CODE
+                    ScreenClient screenClient = ScreenClient.findByIpAdresse(IPAdresse);
+                    if (screenClient == null) {
+                        screenClient = ScreenClient.create(name,Port,IPAdresse, SSHPublic);
+                        System.out.println(screenClient.getID());
+                    } else {
+                        System.out.println("Bereits vorhanden");
+                    }
+
                 }
                 outgoing.close();
-
-
-/*                InputStream inputStream = socket.getInputStream();
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                BufferedImage bufferedImage = ImageIO.read(bufferedInputStream);
-                File outputfile = new File(Main.getConfig().getImageOutputPath() + generatedString + ".jpg");
-                ImageIO.write(bufferedImage, "jpg", outputfile);
-                System.out.println(socket.getPort());
-                System.out.println("Bild Empfangen");*/
-
-
-                //bufferedInputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             } finally {
                 if (socket != null) {
                     try {

@@ -1,11 +1,19 @@
 package de.goldendeveloper.screenserver;
 
-import de.goldendeveloper.mysql.entities.RowBuilder;
-import de.goldendeveloper.mysql.entities.SearchResult;
-import de.goldendeveloper.mysql.entities.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.goldendeveloper.mysql.entities.*;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -113,7 +121,7 @@ public class ScreenClient {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
                 HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(ID)).get();
-                return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(),  map.get("id").getAsInt());
+                return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
             }
         }
         return null;
@@ -124,7 +132,26 @@ public class ScreenClient {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
                 HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnName), name).get();
-                return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(),  map.get("id").getAsInt());
+                return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
+            }
+        }
+        return null;
+    }
+
+    public static ScreenClient findByIpAdresse(String ipadresse) {
+        if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
+            Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
+            if (table.hasColumn(MysqlConnection.ColumnPort)) {
+                try {
+                    if (table.getColumn(MysqlConnection.ColumnIPAdresse).getAll().getAsString().contains(ipadresse)) {
+                        HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnIPAdresse), ipadresse).get();
+                        return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
+                    } else {
+                        return null;
+                    }
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
         return null;
@@ -143,8 +170,7 @@ public class ScreenClient {
                     .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                     .toString();
 
-            String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            directoryName = directoryName + "/" + FileDirectory;
+            String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
             File directory = new File(directoryName);
             if (!directory.exists()) {
                 directory.mkdir();
@@ -198,7 +224,7 @@ public class ScreenClient {
                 String FileDirectory = map.get(MysqlConnection.ColumnFileDirectory).getAsString();
                 String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
 
-                try(BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa"))) {
+                try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa"))) {
                     StringBuilder sb = new StringBuilder();
                     String line = br.readLine();
                     while (line != null) {
@@ -213,6 +239,69 @@ public class ScreenClient {
             }
         }
         return null;
+    }
+
+    public void uploadImage(File file, int duration) {
+        System.out.println("Sending Image to Client...");
+        Socket socket = null;
+        try {
+            socket = new Socket(this.getIPAdresse(), this.getPort());
+            OutputStream output = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode upload = mapper.createObjectNode();
+
+            BufferedImage image = ImageIO.read(file);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", byteArrayOutputStream);
+            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+
+            ObjectNode fileJson = mapper.createObjectNode();
+            fileJson.put("size", size);
+            fileJson.put("byteArray", byteArrayOutputStream.toByteArray());
+
+            upload.set("image", fileJson);
+            upload.put("duration", duration);
+
+            ObjectNode json = mapper.createObjectNode();
+            json.set("upload", upload);
+
+            osw.write(json.toString());
+            osw.flush();
+            osw.close();
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown Host...");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("IOProbleme...");
+            e.printStackTrace();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                    System.out.println("Socket geschlossen...");
+                } catch (IOException e) {
+                    System.out.println("Socket konnte nicht geschlossen werden...");
+                    e.printStackTrace();
+                }
+            }
+        }
+/*        ImageIcon imageIcon = new ImageIcon(Main.getConfig().getImageIcon());
+
+        try {
+            OutputStream outputStream = socket.getOutputStream();
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+            Image image = imageIcon.getImage();
+            BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+            Graphics graphics = bufferedImage.createGraphics();
+            graphics.drawImage(image, 0, 0, null);
+            graphics.dispose();
+            ImageIO.write(bufferedImage, "jpg", bufferedOutputStream);
+            bufferedOutputStream.close();
+            socket.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }*/
     }
 
     public void setID(Integer ID) {
@@ -231,7 +320,7 @@ public class ScreenClient {
                 String FileDirectory = map.get(MysqlConnection.ColumnFileDirectory).getAsString();
                 String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
 
-                try(BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa.pub"))) {
+                try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa.pub"))) {
                     StringBuilder sb = new StringBuilder();
                     String line = br.readLine();
                     while (line != null) {
