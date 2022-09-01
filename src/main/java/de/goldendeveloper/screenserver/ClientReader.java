@@ -27,11 +27,9 @@ public class ClientReader {
                 for (Object st : ts.toArray()) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode node = mapper.readTree(st.toString());
-                    String name;
+                    String name = null;
                     if (node.has("name")) {
                         name = node.get("name").asText();
-                    } else {
-                        name = "none";
                     }
                     int Port = node.get("Port").asInt();
                     String IPAdresse = node.get("IPAdresse").asText();
@@ -42,7 +40,10 @@ public class ClientReader {
 
                     ScreenClient screenClient = ScreenClient.findByIpAdresse(IPAdresse);
                     if (screenClient == null) {
-                        screenClient = ScreenClient.create(name,Port,IPAdresse, SSHPublic);
+                        if (name == null) {
+                            name = "none";
+                        }
+                        ScreenClient.create(name, Port,IPAdresse, SSHPublic);
                     } else {
                         System.out.println("Bereits vorhanden");
                     }
