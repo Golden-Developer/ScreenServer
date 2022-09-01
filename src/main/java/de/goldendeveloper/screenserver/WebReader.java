@@ -3,13 +3,10 @@ package de.goldendeveloper.screenserver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.stream.Stream;
 
 public class WebReader {
@@ -21,16 +18,6 @@ public class WebReader {
         while (true) {
             Socket socket = null;
             try {
-                int leftLimit = 97;
-                int rightLimit = 122;
-                int targetStringLength = 10;
-                Random random = new Random();
-
-                String generatedString = random.ints(leftLimit, rightLimit + 1)
-                        .limit(targetStringLength)
-                        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                        .toString();
-
                 socket = serverSocket.accept();
 
                 BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
@@ -39,23 +26,20 @@ public class WebReader {
                 for (Object st : ts.toArray()) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode node = mapper.readTree(st.toString());
+
+                    System.out.println(node);
                     int id = node.get("id").asInt();
 
-                    if (node.has("Image")) {
-                        InputStream inputStream = socket.getInputStream();
-                        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                        BufferedImage bufferedImage = ImageIO.read(bufferedInputStream);
-
-                        File outputfile = new File(Main.getConfig().getImageOutputPath() + generatedString + ".jpg");
-                        ImageIO.write(bufferedImage, "jpg", outputfile);
-                        ScreenClient screenClient = ScreenClient.findByID(id);
-
-                        if (hasImage()) {
-                            assert screenClient != null;
-                            screenClient.uploadImage(null, 0);
+                    if (node.has("image")) {
+                        String img = node.get("image").asText();
+                        if (!img.isBlank()) {
+                            System.out.println("[WebReader] Bild Empfangen");
+                            ScreenClient screenClient = ScreenClient.findByID(id);
+                            if (screenClient != null) {
+                                System.out.println("[WebReader] Bild weiter an Client gesendet");
+                                screenClient.uploadImage(img, 0);
+                            }
                         }
-
-                        System.out.println("[WebReader] Bild Empfangen");
                     }
                 }
                 outgoing.close();
@@ -72,16 +56,4 @@ public class WebReader {
             }
         }
     }
-
-    public Boolean hasImage() {
-        return true;
-    }
 }
-
-
-/*
-*
-* ByteArrayOutputStream os = new ByteArrayOutputStream();
-ImageIO.write(image,"png", os);
-InputStream fis = new ByteArrayInputStream(os.toByteArray());
-* */

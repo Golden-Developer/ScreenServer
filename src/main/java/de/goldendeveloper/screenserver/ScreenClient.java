@@ -241,7 +241,7 @@ public class ScreenClient {
         return null;
     }
 
-    public void uploadImage(File file, int duration) {
+    public void uploadImage(String img, int duration) {
         System.out.println("Sending Image to Client...");
         Socket socket = null;
         try {
@@ -251,14 +251,8 @@ public class ScreenClient {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode upload = mapper.createObjectNode();
 
-            BufferedImage image = ImageIO.read(file);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", byteArrayOutputStream);
-            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-
             ObjectNode fileJson = mapper.createObjectNode();
-            fileJson.put("size", size);
-            fileJson.put("byteArray", byteArrayOutputStream.toByteArray());
+            fileJson.put("byteArray", img);
 
             upload.set("image", fileJson);
             upload.put("duration", duration);
