@@ -4,15 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.goldendeveloper.mysql.entities.*;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Random;
@@ -280,22 +275,48 @@ public class ScreenClient {
                 }
             }
         }
-/*
+    }
 
+    public void update(String type, String info) {
+        System.out.println("[ScreenClient] Sending Image to Client...");
+        Socket socket = null;
         try {
-            OutputStream outputStream = socket.getOutputStream();
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
-            Image image = imageIcon.getImage();
-            BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-            Graphics graphics = bufferedImage.createGraphics();
-            graphics.drawImage(image, 0, 0, null);
-            graphics.dispose();
-            ImageIO.write(bufferedImage, "jpg", bufferedOutputStream);
-            bufferedOutputStream.close();
-            socket.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }*/
+            socket = new Socket(this.getIPAdresse(), this.getPort());
+            OutputStream output = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode update = mapper.createObjectNode();
+
+            switch (type.toLowerCase()) {
+                case "clientport": update.put("clientport", Integer.parseInt(info));
+                case "serveripadresse": update.put("serveripadresse", info);
+                case "serverport": update.put("serverport", Integer.parseInt(info));
+            }
+
+            ObjectNode json = mapper.createObjectNode();
+            json.set("update", update);
+
+            osw.write(json.toString());
+            osw.flush();
+            osw.close();
+            this.setPort(Integer.parseInt(info));
+        } catch (UnknownHostException e) {
+            System.out.println("[ScreenClient] Unknown Host...");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("[ScreenClient] IOProbleme...");
+            e.printStackTrace();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                    System.out.println("[ScreenClient] Socket geschlossen...");
+                } catch (IOException e) {
+                    System.out.println("[ScreenClient] Socket konnte nicht geschlossen werden...");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void setID(Integer ID) {

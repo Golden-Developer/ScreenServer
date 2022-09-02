@@ -41,6 +41,18 @@ public class WebReader {
                             }
                         }
                     }
+
+                    if (node.has("update")) {
+                        System.out.println("[WebReader] Update Infos Empfangen");
+                        ScreenClient screenClient = ScreenClient.findByID(id);
+                        if (screenClient != null) {
+                            JsonNode update = node.get("update");
+                            if (update.has("type")) {
+                                screenClient.update(update.get("type").asText(), update.get("data").asText());
+                            }
+                            System.out.println("[WebReader] Update Infos weiter an Client gesendet");
+                        }
+                    }
                 }
                 outgoing.close();
             } catch (IOException e) {

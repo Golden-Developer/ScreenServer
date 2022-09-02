@@ -45,7 +45,7 @@ public class ClientReader {
                         }
                         ScreenClient.create(name, Port,IPAdresse, SSHPublic);
                     } else {
-                        System.out.println("Bereits vorhanden");
+                        System.out.println("[ClientReader] Bereits vorhanden");
                     }
 
                 }
@@ -66,17 +66,3 @@ public class ClientReader {
         }
     }
 }
-
-
-
-/*
-        ServerSocket serverSocket = new ServerSocket(Main.getConfig().getServerPort());
-        Socket socket = serverSocket.accept();
-        InputStream inputStream = socket.getInputStream();
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-        BufferedImage bufferedImage = ImageIO.read(bufferedInputStream);
-        File outputfile = new File("C:\\Users\\\\Desktop\\saved.jpg");
-        ImageIO.write(bufferedImage, "jpg", outputfile);
-        bufferedInputStream.close();
-        socket.close();
-*/
