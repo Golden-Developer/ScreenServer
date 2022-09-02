@@ -2,8 +2,7 @@
     <WebServerPort>WebServerPort</WebServerPort>
     <ServerPort>ServerPort</ServerPort>
     <MysqlPort>MysqlPort</MysqlPort>
-    <ImageOutputPath>ImageOutputPath</ImageOutputPath>
     <MysqlIpAdresse>MysqlIpAdresse</MysqlIpAdresse>
-    <MysqlUsername>MysqlUsername</MysqlUsername>
+    <MysqlUsername>MysqlUsernamen</MysqlUsername>
     <MysqlPassword>MysqlPassword</MysqlPassword>
 </login>
