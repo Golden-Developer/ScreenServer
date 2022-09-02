@@ -1,5 +1,8 @@
 package de.goldendeveloper.screenserver;
 
+import de.goldendeveloper.screenserver.client.ClientReader;
+import de.goldendeveloper.screenserver.web.WebReader;
+
 import java.io.*;
 
 public class Main {

@@ -65,7 +65,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.goldendeveloper.entertainment.Main</mainClass>
+                            <mainClass>de.goldendeveloper.screenserver.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

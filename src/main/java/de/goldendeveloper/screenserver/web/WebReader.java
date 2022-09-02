@@ -1,7 +1,8 @@
-package de.goldendeveloper.screenserver;
+package de.goldendeveloper.screenserver.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.goldendeveloper.screenserver.client.ScreenClient;
 
 import java.io.*;
 import java.net.ServerSocket;
