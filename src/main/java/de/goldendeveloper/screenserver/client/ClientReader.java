@@ -46,7 +46,7 @@ public class ClientReader {
                         }
                         ScreenClient.create(name, Port,IPAdresse, SSHPublic);
                     } else {
-                        System.out.println("[ClientReader] Bereits vorhanden");
+                        System.out.println("[ClientReader] Client bereits vorhanden");
                     }
 
                 }

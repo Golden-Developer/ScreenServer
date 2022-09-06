@@ -15,25 +15,12 @@ public class Console {
         String jarFolder = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath().replace('\\', '/');
         File file = new File(jarFolder + "/Config.xml");
         Scanner scanner = new Scanner(System.in);
-
         setWebServerPort(scanner, file);
         setServerPort(scanner, file);
         setMysqlPort(scanner, file);
         setMysqlIpAdresse(scanner, file);
         setMysqlUsername(scanner, file);
         setMysqlPassword(scanner, file);
-
-        /*
-
-        WebServerPort
-        ServerPort
-        MysqlPort
-        MysqlIpAdresse
-        MysqlUsername
-        MysqlPassword
-
-        */
-
         System.out.println("Alle Änderungen können im Dashboard angepasst werden!");
     }
 
@@ -90,8 +77,8 @@ public class Console {
             System.out.println("Das Mysql Passwort lautet: " + mysqlPassword);
             Config.write(file, "MysqlPassword", mysqlPassword);
         } else {
-            System.out.println("Das Mysql Passwort lautet: " + Main.getConfig().getMysqlPassword());
             Config.write(file, "MysqlPassword", String.valueOf(Main.getConfig().getMysqlPassword()));
+            System.out.println("Das Mysql Passwort lautet: " + Main.getConfig().getMysqlPassword());
         }
     }
 
