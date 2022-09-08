@@ -354,27 +354,21 @@ public class ScreenClient {
         return null;
     }
 
-    public static ObjectNode getScreenClients() {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-
-
+    public static HashMap<String, HashMap<String, String>> getScreenClients() {
         Database db = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME);
+        HashMap<String, HashMap<String, String>> clients = new HashMap<>();
         for (Row r : db.getTable(MysqlConnection.TableClients).getRows()) {
             HashMap<String, SearchResult> map = r.get();
             String id = map.get("id").getAsString();
             String ipAdresse = map.get(MysqlConnection.ColumnIPAdresse).getAsString();
             String port = map.get(MysqlConnection.ColumnPort).getAsString();
             String name = map.get(MysqlConnection.ColumnName).getAsString();
-
-            ObjectNode client = mapper.createObjectNode();
-
+            HashMap<String, String> client = new HashMap<>();
             client.put("ipadresse", ipAdresse);
             client.put("port", port);
             client.put("name", name);
-
-            node.set(id, client);
+            clients.put(id, client);
         }
-        return node;
+        return clients;
     }
 }

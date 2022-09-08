@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 public class WebReader {
@@ -30,11 +31,11 @@ public class WebReader {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode node = mapper.readTree(st.toString());
                     System.out.println(node);
-                    if (node.has("all")) {
+                    if (node.has("type") && node.get("type").asText().equalsIgnoreCase("request")) {
+
                         sendToWebServer(ScreenClient.getScreenClients());
                     } else {
                         int id = node.get("id").asInt();
-
                         if (node.has("image")) {
                             String img = node.get("image").asText();
                             if (!img.isBlank()) {
@@ -86,6 +87,32 @@ public class WebReader {
             osw.write(node.toString());
             osw.flush();
             osw.close();
+        } catch (UnknownHostException e) {
+            System.out.println("[WebReader] Unknown Host...");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("[WebReader] IOProbleme...");
+            e.printStackTrace();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                    System.out.println("[WebReader] Socket geschlossen...");
+                } catch (IOException e) {
+                    System.out.println("[WebReader] Socket konnte nicht geschlossen werden...");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void sendToWebServer(HashMap<String, HashMap<String, String>> clients) {
+        System.out.println("[WebReader] Sending Data to WebServer...");
+        Socket socket = null;
+        try {
+            socket = new Socket("127.0.0.1", 54654); //TODO: Get Data From Config or Default Settings
+            OutputStream output = socket.getOutputStream();
+            final ObjectOutputStream mapOutputStream = new ObjectOutputStream(output);
+            mapOutputStream.writeObject(clients);
         } catch (UnknownHostException e) {
             System.out.println("[WebReader] Unknown Host...");
             e.printStackTrace();
