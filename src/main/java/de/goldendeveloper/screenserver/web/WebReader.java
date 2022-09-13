@@ -81,7 +81,7 @@ public class WebReader {
         System.out.println("[WebReader] Sending Data to WebServer...");
         Socket socket = null;
         try {
-            socket = new Socket("127.0.0.1", 58); //TODO: Get Data From Config or Default Settings
+            socket = new Socket("127.0.0.1", 54654); //TODO: Get Data From Config or Default Settings
             OutputStream output = socket.getOutputStream();
             OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
             osw.write(node.toString());

@@ -1,5 +1,7 @@
 package de.goldendeveloper.screenserver.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.goldendeveloper.mysql.entities.*;
@@ -174,10 +176,8 @@ public class ScreenClient {
             }
 
             if (!SSHPublicKey.isBlank()) {
-                File file = new File(directoryName + "/id_rsa.pub");
                 try {
-                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                    BufferedWriter bw = new BufferedWriter(fw);
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(directoryName + "/id_rsa.pub").getAbsoluteFile()));
                     bw.write(SSHPublicKey);
                     bw.close();
                 } catch (IOException e) {
@@ -218,8 +218,7 @@ public class ScreenClient {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn("id")) {
                 HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).get();
-                String FileDirectory = map.get(MysqlConnection.ColumnFileDirectory).getAsString();
-                String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
+                String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + map.get(MysqlConnection.ColumnFileDirectory).getAsString();
 
                 try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa"))) {
                     StringBuilder sb = new StringBuilder();
@@ -243,8 +242,7 @@ public class ScreenClient {
         Socket socket = null;
         try {
             socket = new Socket(this.getIPAdresse(), this.getPort());
-            OutputStream output = socket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
+            OutputStreamWriter osw = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode upload = mapper.createObjectNode();
 
@@ -284,8 +282,7 @@ public class ScreenClient {
         Socket socket = null;
         try {
             socket = new Socket(this.getIPAdresse(), this.getPort());
-            OutputStream output = socket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(output, StandardCharsets.UTF_8);
+            OutputStreamWriter osw = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode update = mapper.createObjectNode();
 
@@ -334,8 +331,7 @@ public class ScreenClient {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn("id")) {
                 HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).get();
-                String FileDirectory = map.get(MysqlConnection.ColumnFileDirectory).getAsString();
-                String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
+                String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + map.get(MysqlConnection.ColumnFileDirectory).getAsString();
 
                 try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa.pub"))) {
                     StringBuilder sb = new StringBuilder();
@@ -354,20 +350,19 @@ public class ScreenClient {
         return null;
     }
 
-    public static HashMap<String, HashMap<String, String>> getScreenClients() {
+    public static ObjectNode getScreenClients() throws JsonProcessingException {
         Database db = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME);
-        HashMap<String, HashMap<String, String>> clients = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode clients = mapper.createObjectNode();
+
         for (Row r : db.getTable(MysqlConnection.TableClients).getRows()) {
+            ObjectNode client = mapper.createObjectNode();
             HashMap<String, SearchResult> map = r.get();
-            String id = map.get("id").getAsString();
-            String ipAdresse = map.get(MysqlConnection.ColumnIPAdresse).getAsString();
-            String port = map.get(MysqlConnection.ColumnPort).getAsString();
-            String name = map.get(MysqlConnection.ColumnName).getAsString();
-            HashMap<String, String> client = new HashMap<>();
-            client.put("ipadresse", ipAdresse);
-            client.put("port", port);
-            client.put("name", name);
-            clients.put(id, client);
+            client.put("id", map.get("id").getAsString());
+            client.put("ipadresse", map.get(MysqlConnection.ColumnIPAdresse).getAsString());
+            client.put("port", map.get(MysqlConnection.ColumnPort).getAsString());
+            client.put("name", map.get(MysqlConnection.ColumnName).getAsString());
+            clients.set(map.get("id").getAsString(), client);
         }
         return clients;
     }
