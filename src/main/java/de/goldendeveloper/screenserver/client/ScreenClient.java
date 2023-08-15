@@ -45,7 +45,7 @@ public class ScreenClient {
     public void setSSHPrivateKey(String SSHPrivateKey) throws URISyntaxException {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
-            String FileDirectory = table.getRow(table.getColumn("id"), String.valueOf(getID())).get().get(MysqlConnection.ColumnFileDirectory).getAsString();
+            String FileDirectory = table.getRow(table.getColumn("id"), String.valueOf(getID())).getData().get(MysqlConnection.ColumnFileDirectory).getAsString();
             String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
 
             File directory = new File(directoryName);
@@ -71,7 +71,7 @@ public class ScreenClient {
     public void setSSHPublicKey(String SSHPublicKey) throws URISyntaxException {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
-            String FileDirectory = table.getRow(table.getColumn("id"), String.valueOf(getID())).get().get(MysqlConnection.ColumnFileDirectory).getAsString();
+            String FileDirectory = table.getRow(table.getColumn("id"), String.valueOf(getID())).getData().get(MysqlConnection.ColumnFileDirectory).getAsString();
             String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + FileDirectory;
 
             File directory = new File(directoryName);
@@ -98,7 +98,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnPort), String.valueOf(port)).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnPort), String.valueOf(port)).getData();
                 table.dropRow(map.get("id").getAsInt());
             }
         }
@@ -108,7 +108,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnPort), String.valueOf(port)).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnPort), String.valueOf(port)).getData();
                 return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), port, map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
             }
         }
@@ -119,7 +119,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(ID)).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(ID)).getData();
                 return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
             }
         }
@@ -130,7 +130,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnName), name).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnName), name).getData();
                 return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
             }
         }
@@ -143,7 +143,7 @@ public class ScreenClient {
             if (table.hasColumn(MysqlConnection.ColumnPort)) {
                 try {
                     if (table.getColumn(MysqlConnection.ColumnIPAdresse).getAll().getAsString().contains(ipadresse)) {
-                        HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnIPAdresse), ipadresse).get();
+                        HashMap<String, SearchResult> map = table.getRow(table.getColumn(MysqlConnection.ColumnIPAdresse), ipadresse).getData();
                         return new ScreenClient(map.get(MysqlConnection.ColumnName).getAsString(), map.get(MysqlConnection.ColumnPort).getAsInt(), map.get(MysqlConnection.ColumnIPAdresse).getAsString(), map.get("id").getAsInt());
                     } else {
                         return null;
@@ -194,7 +194,7 @@ public class ScreenClient {
                     .build()
             );
 
-            int id = table.getRow(table.getColumn(MysqlConnection.ColumnName), name).get().get("id").getAsInt();
+            int id = table.getRow(table.getColumn(MysqlConnection.ColumnName), name).getData().get("id").getAsInt();
 
             return new ScreenClient(name, port, IPAdresse, id);
         }
@@ -217,7 +217,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn("id")) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).getData();
                 String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + map.get(MysqlConnection.ColumnFileDirectory).getAsString();
 
                 try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa"))) {
@@ -330,7 +330,7 @@ public class ScreenClient {
         if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.DatabaseNAME)) {
             Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.DatabaseNAME).getTable(MysqlConnection.TableClients);
             if (table.hasColumn("id")) {
-                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).get();
+                HashMap<String, SearchResult> map = table.getRow(table.getColumn("id"), String.valueOf(this.ID)).getData();
                 String directoryName = new File(ScreenClient.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath() + "/" + map.get(MysqlConnection.ColumnFileDirectory).getAsString();
 
                 try (BufferedReader br = new BufferedReader(new FileReader(directoryName + "/id_rsa.pub"))) {
@@ -357,7 +357,7 @@ public class ScreenClient {
 
         for (Row r : db.getTable(MysqlConnection.TableClients).getRows()) {
             ObjectNode client = mapper.createObjectNode();
-            HashMap<String, SearchResult> map = r.get();
+            HashMap<String, SearchResult> map = r.getData();
             client.put("id", map.get("id").getAsString());
             client.put("ipadresse", map.get(MysqlConnection.ColumnIPAdresse).getAsString());
             client.put("port", map.get(MysqlConnection.ColumnPort).getAsString());
