@@ -3,6 +3,9 @@ package de.goldendeveloper.screenserver;
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.Table;
+import de.goldendeveloper.mysql.exceptions.NoConnectionException;
+
+import java.sql.SQLException;
 
 public class MysqlConnection {
 
@@ -14,7 +17,7 @@ public class MysqlConnection {
     public static String ColumnPort = "Port";
     public static String ColumnIPAdresse = "IPAdresse";
 
-    public MysqlConnection() {
+    public MysqlConnection() throws NoConnectionException, SQLException {
         mysql = new MYSQL(Main.getConfig().getMysqlIpAdresse(), Main.getConfig().getMysqlUsername(), Main.getConfig().getMysqlPassword(), Main.getConfig().getMysqlPort());
 
         if (!mysql.existsDatabase(DatabaseNAME)) {
