@@ -105,7 +105,7 @@
         <dependency>
             <groupId>de.goldendeveloper</groupId>
             <artifactId>MYSQL-Api</artifactId>
-            <version>5.7.3</version>
+            <version>5.7.5</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
