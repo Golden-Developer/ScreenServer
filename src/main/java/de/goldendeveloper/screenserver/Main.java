@@ -11,16 +11,6 @@ public class Main {
     private static MysqlConnection mysqlConnection;
 
     public static void main(String[] args) throws Exception {
-     /*   if (!Config.Check()) {
-            String jarfolder = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath().replace('\\', '/');
-            File file = new File(jarfolder + "/Config.xml");
-            if (file.exists()) {
-                file.delete();
-            }
-            Config.Export("ExampleConfig.xml");
-            new Console().run();
-        }
-*/
         config = new Config();
         if (!Config.Exists()) {
             Config.Export("ExampleConfig.xml");

@@ -1,6 +1,7 @@
 package de.goldendeveloper.screenserver;
 
 import com.google.common.net.InetAddresses;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -22,84 +23,21 @@ import java.nio.file.Paths;
 
 public class Config {
 
-    private int WebServerPort;
-    private int MysqlPort;
-    private int ServerPort;
-    private String MysqlIpAdresse;
-    private String MysqlUsername;
-    private String MysqlPassword;
+    private final int WebServerPort;
+    private final int MysqlPort;
+    private final int ServerPort;
+    private final String MysqlIpAdresse;
+    private final String MysqlUsername;
+    private final String MysqlPassword;
 
     public Config() {
-        try {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream local = classloader.getResourceAsStream("config.xml");
-
-            String jarFolder = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath().replace('\\', '/');
-            File file = new File(jarFolder + "/Config.xml");
-
-            Path path = Files.createTempFile("Config", ".xml");
-
-            if (file.exists()) {
-                InputStream targetStream = new FileInputStream(file);
-                if (targetStream != null && targetStream.available() >= 0) {
-                    readXML(targetStream);
-                }
-            } else {
-                if (local != null && Files.exists(path)) {
-                    readXML(local);
-                } else {
-                    local = classloader.getResourceAsStream("Config.xml");
-                    readXML(local);
-                }
-            }
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        ;
-    }
-
-    private void readXML(InputStream inputStream) {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(inputStream);
-            doc.getDocumentElement().normalize();
-
-            NodeList list = doc.getElementsByTagName("login");
-            for (int i = 0; i < list.getLength(); i++) {
-                if (list.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) list.item(i);
-                    String WebServerPort = element.getElementsByTagName("WebServerPort").item(0).getTextContent();
-                    String MysqlPort = element.getElementsByTagName("MysqlPort").item(0).getTextContent();
-                    String ServerPort = element.getElementsByTagName("ServerPort").item(0).getTextContent();
-                    String MysqlIpAdresse = element.getElementsByTagName("MysqlIpAdresse").item(0).getTextContent();
-                    String MysqlUsername = element.getElementsByTagName("MysqlUsername").item(0).getTextContent();
-                    String MysqlPassword = element.getElementsByTagName("MysqlPassword").item(0).getTextContent();
-
-                    if (!WebServerPort.isEmpty() || !WebServerPort.isBlank()) {
-                        this.WebServerPort = Integer.parseInt(WebServerPort);
-                    }
-                    if (!MysqlPort.isEmpty() || !MysqlPort.isBlank()) {
-                        this.MysqlPort = Integer.parseInt(MysqlPort);
-                    }
-                    if (!ServerPort.isEmpty() || !ServerPort.isBlank()) {
-                        this.ServerPort = Integer.parseInt(ServerPort);
-                    }
-                    if (!MysqlIpAdresse.isEmpty() || !MysqlIpAdresse.isBlank()) {
-                        this.MysqlIpAdresse = MysqlIpAdresse;
-                    }
-                    if (!MysqlUsername.isEmpty() || !MysqlUsername.isBlank()) {
-                        this.MysqlUsername = MysqlUsername;
-                    }
-                    if (!MysqlPassword.isEmpty() || !MysqlPassword.isBlank()) {
-                        this.MysqlPassword = MysqlPassword;
-                    }
-                }
-            }
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
-        }
+        Dotenv dotenv = Dotenv.load();
+        this.WebServerPort = Integer.parseInt(dotenv.get("WEB_SERVER_PORT"));
+        this.MysqlPort = Integer.parseInt(dotenv.get("MYSQL_PORT"));
+        this.ServerPort = Integer.parseInt(dotenv.get("SERVER_PORT"));
+        this.MysqlIpAdresse = dotenv.get("MYSQL_IP_ADDRESS");
+        this.MysqlUsername = dotenv.get("MYSQL_USERNAME");
+        this.MysqlPassword = dotenv.get("MYSQL_PASSWORD");
     }
 
     public String getMysqlIpAdresse() {
@@ -223,19 +161,6 @@ public class Config {
             assert resStreamOut != null;
             resStreamOut.close();
         }
-    }
-
-    public static Boolean Check() {
-        if (!Console.isInteger(String.valueOf(Main.getConfig().getWebServerPort()))) {
-            return false;
-        }
-        if (!Console.isInteger(String.valueOf(Main.getConfig().getServerPort()))) {
-            return false;
-        }
-        if (!Console.isInteger(String.valueOf(Main.getConfig().getMysqlPort()))) {
-            return false;
-        }
-        return InetAddresses.isInetAddress(Main.getConfig().getMysqlIpAdresse());
     }
 }
 

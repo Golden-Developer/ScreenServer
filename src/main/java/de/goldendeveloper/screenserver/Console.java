@@ -10,7 +10,6 @@ import java.util.Scanner;
 
 public class Console {
 
-
     public void run() throws URISyntaxException, XMLStreamException, FileNotFoundException {
         String jarFolder = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath().replace('\\', '/');
         File file = new File(jarFolder + "/Config.xml");
