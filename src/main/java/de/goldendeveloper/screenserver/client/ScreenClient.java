@@ -1,12 +1,11 @@
 package de.goldendeveloper.screenserver.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.goldendeveloper.mysql.entities.*;
 import de.goldendeveloper.screenserver.Main;
 import de.goldendeveloper.screenserver.MysqlConnection;
+import io.github.coho04.mysql.entities.*;
 
 import java.io.*;
 import java.net.Socket;
